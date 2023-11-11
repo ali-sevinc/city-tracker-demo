@@ -1,17 +1,21 @@
+import { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import CityContextProvider from "./store/CityContext";
 
+import CityContextProvider from "./store/CityContext";
+import AuthContextProvider from "./store/AuthContext";
+
+import SpinnerFullPage from "./components/ui/SpinnerFullPage";
 import CountryList from "./components/city/CountryList";
 import CityList from "./components/city/CityList";
-import PageNotFound from "./pages/PageNotFound";
-import AppLayout from "./pages/AppLayout";
 import City from "./components/city/City";
 import Form from "./components/user/Form";
-import Homepage from "./pages/Homepage";
-import Product from "./pages/Product";
-import Pricing from "./pages/Pricing";
-import Login from "./pages/Login";
-import AuthContextProvider from "./store/AuthContext";
+
+const PageNotFound = lazy(() => import("./pages/PageNotFound"));
+const Homepage = lazy(() => import("./pages/Homepage"));
+const AppLayout = lazy(() => import("./pages/AppLayout"));
+const Product = lazy(() => import("./pages/Product"));
+const Pricing = lazy(() => import("./pages/Pricing"));
+const Login = lazy(() => import("./pages/Login"));
 
 export type CityType = {
   cityName: string;
@@ -31,22 +35,24 @@ export default function App() {
     <AuthContextProvider>
       <CityContextProvider>
         <BrowserRouter>
-          <Routes>
-            <Route index element={<Homepage />} />
-            <Route path="product" element={<Product />} />
-            <Route path="pricing" element={<Pricing />} />
-            <Route path="login" element={<Login />} />
+          <Suspense fallback={<SpinnerFullPage />}>
+            <Routes>
+              <Route index element={<Homepage />} />
+              <Route path="product" element={<Product />} />
+              <Route path="pricing" element={<Pricing />} />
+              <Route path="login" element={<Login />} />
 
-            <Route path="app" element={<AppLayout />}>
-              <Route index element={<Navigate to="cities" replace />} />
-              <Route path="cities" element={<CityList />} />
-              <Route path="cities/:id" element={<City />} />
-              <Route path="countries" element={<CountryList />} />
-              <Route path="form" element={<Form />} />
-            </Route>
+              <Route path="app" element={<AppLayout />}>
+                <Route index element={<Navigate to="cities" replace />} />
+                <Route path="cities" element={<CityList />} />
+                <Route path="cities/:id" element={<City />} />
+                <Route path="countries" element={<CountryList />} />
+                <Route path="form" element={<Form />} />
+              </Route>
 
-            <Route path="*" element={<PageNotFound />} />
-          </Routes>
+              <Route path="*" element={<PageNotFound />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </CityContextProvider>
     </AuthContextProvider>
